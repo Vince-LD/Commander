@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[project]
+name = "Commander"
+version = "0.1.0"
+authors = [{ name = "Vincent Le Du" }]
+description = "Commander is a simple library to consistently build and execute command lines using light objects instead of having to reinvent the wheel everytime."
+readme = "README.md"
+license = { file = "LICENSE" }
+classifiers = [
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: OS Independent",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">= 3.11"
+keywords = ["Utils", "Command", "Command line", "Shell"]
+
+
+[project.urls]
+Repository = "https://github.com/Vince-LD/Commander"
+Issues = "https://github.com/Vince-LD/Commander/issues"
+
+
+[tool.hatch.build.targets.wheel]
+packages = ["commander"]
