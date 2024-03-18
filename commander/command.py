@@ -1,35 +1,48 @@
 import subprocess
-from typing import Optional
+from typing import Any, Optional
 from commander.expected import ExpectedResult, NoStdErr, SuccessCode
 from commander.arguments import CommandArg
+from commander.exceptions import UnexpectedResultError
 
 
 class Command:
     def __init__(
         self,
-        name: str,
+        command: str,
         arguments: Optional[list[CommandArg]] = None,
         expect: Optional[list[ExpectedResult]] = None,
     ) -> None:
         self.stdout = ""
         self.stderr = ""
         self.code: Optional[int] = None
-        self.name = name
+        self.command = command
         self.arguments: list[CommandArg] = arguments or []
         self.expect: list[ExpectedResult] = expect or [NoStdErr(), SuccessCode()]
 
-    def __str__(self) -> str:
-        return f"{self.name} {' '.join(arg.fmt_str() for arg in self.arguments)}"
+    def join(self) -> str:
+        return f"{self.command} {' '.join(arg.fmt_str() for arg in self.arguments)}"
 
-    def as_list(self) -> list[str]:
-        return [self.name, *sum((arg.fmt_list() for arg in self.arguments), [])]
+    def build(self) -> list[str]:
+        return [self.command, *sum((arg.fmt_list() for arg in self.arguments), [])]
 
-    def execute(self) -> None:
-        command = [self.name, *sum((arg.fmt_list() for arg in self.arguments), [])]
-        process = subprocess.run(command, capture_output=True, text=True, shell=True)
+    def execute(self, shell: bool = False) -> None:
+        command = self.build()
+        process = subprocess.run(command, capture_output=True, text=True, shell=shell)
         self.stdout = process.stdout
         self.stderr = process.stderr
         self.code = process.returncode
 
     def check(self) -> bool:
-        return all(awaited.check(self) for awaited in self.expect)
+        results = tuple(awaited.check(self) for awaited in self.expect)
+        if all(results):
+            return True
+        else:
+            false_checks = tuple(
+                expect_obj
+                for expect_obj, res in zip(self.expect, results)
+                if res is False
+            )
+            raise UnexpectedResultError(f"Unexpected results:\n{false_checks}")
+
+    def arg_values(self) -> list[Any]:
+        return [self.command, *sum((arg.arg_values() for arg in self.arguments), [])]

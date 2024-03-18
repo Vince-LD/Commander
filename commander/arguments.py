@@ -6,6 +6,10 @@ T = TypeVar("T")
 
 class CommandArg(ABC, Generic[T]):
     @abstractmethod
+    def arg_values(self) -> list[T]:
+        ...
+
+    @abstractmethod
     def fmt_list(self) -> list[str]:
         ...
 
@@ -14,15 +18,18 @@ class CommandArg(ABC, Generic[T]):
         ...
 
 
-class PositionalArg(CommandArg, Generic[T]):
+class PositionalArgs(CommandArg, Generic[T]):
     def __init__(self, *args: T) -> None:
-        self.value = args
+        self.args = args
 
     def fmt_list(self) -> list[str]:
-        return [str(arg) for arg in self.value]
+        return [str(arg) for arg in self.args]
 
     def fmt_str(self) -> str:
         return " ".join(self.fmt_list())
+
+    def arg_values(self) -> list[T]:
+        return list(self.args)
 
 
 class SimpleNamedArgument(CommandArg, Generic[T]):
@@ -36,6 +43,9 @@ class SimpleNamedArgument(CommandArg, Generic[T]):
     def fmt_str(self) -> str:
         return " ".join(self.fmt_list())
 
+    def arg_values(self) -> list[str | T]:
+        return [self.name, self.value]
+
 
 class ListNamedArgument(CommandArg, Generic[T]):
     def __init__(self, name: str, value: list[T]) -> None:
@@ -47,6 +57,9 @@ class ListNamedArgument(CommandArg, Generic[T]):
 
     def fmt_str(self) -> str:
         return " ".join(self.fmt_list())
+
+    def arg_values(self) -> list[str | T]:
+        return [self.name, *self.value]
 
 
 class RepeatableNamedArg(CommandArg, Generic[T]):
@@ -63,6 +76,9 @@ class RepeatableNamedArg(CommandArg, Generic[T]):
     def fmt_str(self) -> str:
         return " ".join(self.fmt_list())
 
+    def arg_values(self) -> list[str | T]:
+        return [self.name, *self.value]
+
 
 class ConditionalArg(CommandArg, Generic[T]):
     def __init__(self, condition: bool, arg: CommandArg[T]) -> None:
@@ -74,3 +90,6 @@ class ConditionalArg(CommandArg, Generic[T]):
 
     def fmt_str(self) -> str:
         return self.arg.fmt_str() if self.condition else ""
+
+    def arg_values(self) -> list[T]:
+        return self.arg.arg_values()

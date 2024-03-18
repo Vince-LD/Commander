@@ -38,6 +38,14 @@ class ExpectCode(ExpectedResult):
         return result.code == self.code
 
 
+class PathsExist(ExpectedResult):
+    def __init__(self, *paths: str) -> None:
+        self.paths = paths
+
+    def check(self, result: "Command") -> bool:
+        return all(os.path.isfile(path) for path in self.paths)
+
+
 class FilesExist(ExpectedResult):
     def __init__(self, *files: str) -> None:
         self.files = files
