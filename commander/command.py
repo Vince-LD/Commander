@@ -1,7 +1,7 @@
 import subprocess
 from typing import Any, Optional
-from commander.expected import ExpectedResult, NoStdErr, SuccessCode
-from commander.arguments import CommandArg
+from commander.expected import AbstractExpectedResult, NoStdErr, SuccessCode
+from commander.arguments import AbstractArg
 from commander.exceptions import UnexpectedResultError
 
 
@@ -9,15 +9,18 @@ class Command:
     def __init__(
         self,
         command: str,
-        arguments: Optional[list[CommandArg]] = None,
-        expect: Optional[list[ExpectedResult]] = None,
+        arguments: Optional[list[AbstractArg]] = None,
+        expect: Optional[list[AbstractExpectedResult]] = None,
     ) -> None:
         self.stdout = ""
         self.stderr = ""
         self.code: Optional[int] = None
         self.command = command
-        self.arguments: list[CommandArg] = arguments or []
-        self.expect: list[ExpectedResult] = expect or [NoStdErr(), SuccessCode()]
+        self.arguments: list[AbstractArg] = arguments or []
+        self.expect: list[AbstractExpectedResult] = expect or [
+            NoStdErr(),
+            SuccessCode(),
+        ]
 
     def join(self) -> str:
         return f"{self.command} {' '.join(arg.fmt_str() for arg in self.arguments)}"

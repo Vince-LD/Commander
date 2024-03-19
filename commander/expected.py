@@ -6,13 +6,13 @@ if TYPE_CHECKING:
     from commander.command import Command
 
 
-class ExpectedResult(ABC):
+class AbstractExpectedResult(ABC):
     @abstractmethod
     def check(self, result: "Command") -> bool:
         ...
 
 
-class ExpectedStdout(ExpectedResult):
+class ExpectedStdout(AbstractExpectedResult):
     def __init__(self, stdout: str) -> None:
         self.stdout = stdout
 
@@ -20,17 +20,17 @@ class ExpectedStdout(ExpectedResult):
         return self.stdout in result.stdout
 
 
-class NoStdErr(ExpectedResult):
+class NoStdErr(AbstractExpectedResult):
     def check(self, result: "Command") -> bool:
         return result.stderr == ""
 
 
-class SuccessCode(ExpectedResult):
+class SuccessCode(AbstractExpectedResult):
     def check(self, result: "Command") -> bool:
         return result.code == 0
 
 
-class ExpectCode(ExpectedResult):
+class ExpectCode(AbstractExpectedResult):
     def __init__(self, code: int) -> None:
         self.code = code
 
@@ -38,7 +38,7 @@ class ExpectCode(ExpectedResult):
         return result.code == self.code
 
 
-class PathsExist(ExpectedResult):
+class PathsExist(AbstractExpectedResult):
     def __init__(self, *paths: str) -> None:
         self.paths = paths
 
@@ -46,7 +46,7 @@ class PathsExist(ExpectedResult):
         return all(os.path.isfile(path) for path in self.paths)
 
 
-class FilesExist(ExpectedResult):
+class FilesExist(AbstractExpectedResult):
     def __init__(self, *files: str) -> None:
         self.files = files
 

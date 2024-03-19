@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 T = TypeVar("T")
 
 
-class CommandArg(ABC, Generic[T]):
+class AbstractArg(ABC, Generic[T]):
     @abstractmethod
     def arg_values(self) -> list[T]:
         ...
@@ -18,7 +18,7 @@ class CommandArg(ABC, Generic[T]):
         ...
 
 
-class PositionalArgs(CommandArg, Generic[T]):
+class PositionalArgs(AbstractArg, Generic[T]):
     def __init__(self, *args: T) -> None:
         self.args = args
 
@@ -32,7 +32,7 @@ class PositionalArgs(CommandArg, Generic[T]):
         return list(self.args)
 
 
-class SimpleNamedArgument(CommandArg, Generic[T]):
+class SimpleNamedArg(AbstractArg, Generic[T]):
     def __init__(self, name: str, value: T) -> None:
         self.name = name if name.startswith("-") else f"--{name}"
         self.value = value
@@ -47,7 +47,7 @@ class SimpleNamedArgument(CommandArg, Generic[T]):
         return [self.name, self.value]
 
 
-class ListNamedArgument(CommandArg, Generic[T]):
+class ListNamedArg(AbstractArg, Generic[T]):
     def __init__(self, name: str, value: list[T]) -> None:
         self.name = name if name.startswith("-") else f"--{name}"
         self.value = value
@@ -62,7 +62,7 @@ class ListNamedArgument(CommandArg, Generic[T]):
         return [self.name, *self.value]
 
 
-class RepeatableNamedArg(CommandArg, Generic[T]):
+class RepeatableNamedArg(AbstractArg, Generic[T]):
     def __init__(self, name: str, value: list[T]) -> None:
         self.name = name if name.startswith("-") else f"--{name}"
         self.value = value
@@ -80,8 +80,8 @@ class RepeatableNamedArg(CommandArg, Generic[T]):
         return [self.name, *self.value]
 
 
-class ConditionalArg(CommandArg, Generic[T]):
-    def __init__(self, condition: bool, arg: CommandArg[T]) -> None:
+class ConditionalArg(AbstractArg, Generic[T]):
+    def __init__(self, condition: bool, arg: AbstractArg[T]) -> None:
         self.condition = condition
         self.arg = arg
 
