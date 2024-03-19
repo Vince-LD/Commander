@@ -12,7 +12,7 @@ class AbstractExpectedResult(ABC):
         ...
 
 
-class ExpectedStdout(AbstractExpectedResult):
+class StdoutContains(AbstractExpectedResult):
     def __init__(self, stdout: str) -> None:
         self.stdout = stdout
 
