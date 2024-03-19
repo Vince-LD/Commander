@@ -2,7 +2,7 @@ import subprocess
 from typing import Any, Optional
 from commander.expected import AbstractExpectedResult, NoStdErr, SuccessCode
 from commander.arguments import AbstractArg
-from commander.exceptions import UnexpectedResultError
+from commander.exceptions import CommandNotExecuted, UnexpectedResultError
 
 
 class Command:
@@ -21,6 +21,7 @@ class Command:
             NoStdErr(),
             SuccessCode(),
         ]
+        self._executed = False
 
     def join(self) -> str:
         return f"{self.command} {' '.join(arg.fmt_str() for arg in self.arguments)}"
@@ -34,8 +35,14 @@ class Command:
         self.stdout = process.stdout
         self.stderr = process.stderr
         self.code = process.returncode
+        self._executed = True
 
     def check(self) -> bool:
+        if not self._executed:
+            raise CommandNotExecuted(
+                "Command should be executed before checking its results."
+                "Call Command.execute() before Command.check() to fix this error."
+            )
         results = tuple(awaited.check(self) for awaited in self.expect)
         if all(results):
             return True

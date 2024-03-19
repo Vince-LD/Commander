@@ -32,6 +32,20 @@ class PositionalArgs(AbstractArg, Generic[T]):
         return list(self.args)
 
 
+class FlagArgs(AbstractArg):
+    def __init__(self, *flags: str) -> None:
+        self.flags = flags
+
+    def fmt_list(self) -> list[str]:
+        return list(self.flags)
+
+    def fmt_str(self) -> str:
+        return " ".join(self.flags)
+
+    def arg_values(self) -> list[str]:
+        return list(self.flags)
+
+
 class SimpleNamedArg(AbstractArg, Generic[T]):
     def __init__(self, name: str, value: T) -> None:
         self.name = name if name.startswith("-") else f"--{name}"
