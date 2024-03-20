@@ -7,35 +7,31 @@ The goal of this library is to use standard interfaces to assemble commande line
 Basic examples can be found [here](examples/basic.py) and below:
 
 ```python
-cmd = Command(
-        command="cp",
-        arguments=[
-            PositionalArgs("src/path/first.txt", "src/path/second.txt", "dest/path/")
-        ],
-        expect=[
-            NoStdErr(),
-            SuccessCode(),
-            FilesExist("dest/path/first.txt", "dest/path/second.txt"),
-        ],
-    )
+cmd = Command("cp")
+cmd.add_arguments(PositionalArgs("src/path/first.txt", "src/path/second.txt", "dest/path/"))
+cmd.add_expectations(
+        NoStdErr(),
+        SuccessCode(),
+        FilesExist("dest/path/first.txt", "dest/path/second.txt"),
+)
 assert cmd.join() == "cp src/path/first.txt src/path/second.txt dest/path/"
 ```
 
 ```python
-cmd = Command(
-    command="ls",
-    arguments=[
-        FlagArgs("--all", "-R"), 
-        PositionalArgs("dest/path/")],
-    expect=[
+cmd = Command("ls")
+cmd.add_arguments(
+    PositionalArgs("dest/path/"),
+    FlagArgs("--all", "-R"),
+) 
+cmd.add_expectations(
         SuccessCode(), 
         StdoutContains("inner/dir")
-        ],
 )
 assert cmd.join() == "ls --all -R dest/path/"
 ```
 
 ```python
+# Other syntax using the constructor
 cmd = Command(
         command="grep",
         arguments=[
