@@ -25,7 +25,7 @@ assert cmd.join() == "cp src/path/first.txt src/path/second.txt dest/path/"
 cmd = Command(
     command="ls",
     arguments=[
-        lagArgs("--all", "-R"), 
+        FlagArgs("--all", "-R"), 
         PositionalArgs("dest/path/")],
     expect=[
         SuccessCode(), 
