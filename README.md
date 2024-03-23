@@ -20,8 +20,8 @@ assert cmd.join() == "cp src/path/first.txt src/path/second.txt dest/path/"
 ```python
 cmd = Command("ls")
 cmd.add_arguments(
-    PositionalArgs("dest/path/"),
     FlagArgs("--all", "-R"),
+    PositionalArgs("dest/path/"),
 ) 
 cmd.add_expectations(
         SuccessCode(), 
